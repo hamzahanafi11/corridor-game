@@ -1,0 +1,60 @@
+/************* Me *************/
+.about-me{
+	position: absolute;
+	right: 15px;
+	bottom: 10px;
+}
+
+/************* Results *************/
+
+.results{
+	text-align: center;
+	padding: 15px;
+	margin-top: 30px;
+	display: none;
+	clear: both;
+}
+.results button{
+	cursor: pointer;
+	width: 100px;
+	height: 35px;
+	color: white;
+	background-color: #2d8be8;
+	border: 1px solid #0b5daf;
+	border-radius: 3px;
+}
+
+/************* Board *************/
+.main{
+	width: 510px;
+	margin: auto;
+}
+ul{
+	/*margin-left: 413px;
+    margin-right: 412px;*/
+}
+ul li{
+	cursor: pointer;
+	display: flex;
+	float: left;
+	list-style-type: none;
+	width:50px;
+	height: 50px;
+	background-color: #121212;
+	border:1px solid #afafaf;
+}
+
+
+/************* display *************/
+
+.display{
+	border: 1px	black dashed;
+	padding: 15px;
+}
+
+/************* display *************/
+
+.fa{
+/*	color: white;*/
+	margin: auto;
+}
