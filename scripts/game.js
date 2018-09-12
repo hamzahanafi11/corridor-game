@@ -1,65 +1,71 @@
 
-// reate the board 
+// reate the board
 var board = new Board();
 
 // create players
-var marian	 = new Player(63,'#e6183c');
-var steven	 = new Player(37,'#13aede');
-var kemberly = new Player(45,'#eaef2b');
-var brady	 = new Player(77,'#af5a0f');
+var marian	 = new Player(5,'#e6183c','marian');
+var steven	 = new Player(37,'#13aede','steven');
+var kemberly = new Player(45,'#eaef2b','kemberly');
+var brady	 = new Player(77,'#af5a0f','brady');
 
 // set initial position for players
 board.init();
 
-// game params 
-var turn = 'M';
+// game params
+var turn = 'marian';
 
 
 $('ul li').on('click',function(evt){
-	var goinTo = $(this).index();
+	var goinTo = $(this).index() + 1;
 	switch(turn){
-		case 'M':
-			console.log('M');
+		case 'marian':
+			console.log('marian');
 			console.log('==> from : ' + marian.pos);
 			console.log('==> to   : ' + goinTo);
 			console.log('==> res  : ' + checkMove(marian.pos,goinTo));
-			if(checkMove(marian.pos,goinTo)){
+			if( checkMove(marian.pos,goinTo) && board.isPlaceEmpty(goinTo) ){
 				marian.moveTo(goinTo);
-				turn = 'S';
+				//turn = 'steven';
 			}
 		break;
-		case 'S':
-			console.log('S');
-			turn = 'K';
+		case 'steven':
+			if( checkMove(steven.pos,goinTo) && board.isPlaceEmpty(goinTo) ){
+				steven.moveTo(goinTo);
+				turn = 'kemberly';
+			}
 		break;
-		case 'K':
-			console.log('K');
-			turn = 'B';
+		case 'kemberly':
+			if( checkMove(kemberly.pos,goinTo) && board.isPlaceEmpty(goinTo) ){
+				kemberly.moveTo(goinTo);
+				turn = 'brady';
+			}
 		break;
-		case 'B':
-			console.log('B');
-			turn = 'M';
+		case 'brady':
+			if( checkMove(brady.pos,goinTo) && board.isPlaceEmpty(goinTo) ){
+				brady.moveTo(goinTo);
+				turn = 'marian';
+			}
 		break;
 	}
 });
 
 
 function checkMove(currentPos, newPos){
-	
+
 	if(isInCorner(currentPos)){
 		var corner = getCorner(currentPos);
 		switch(corner){
 			case 'TL':
-				return newPos == 1 || newPos == 9;
+				return newPos == currentPos + 1 || newPos == currentPos + 9;
 			break;
 			case 'TR':
-				return newPos == 7 || newPos == 17;
+				return newPos == currentPos - 1 || newPos == currentPos + 9;
 			break;
 			case 'BL':
-				return newPos == 63 || newPos == 73;
+				return newPos == currentPos - 9 || newPos == currentPos + 1;
 			break;
 			case 'BR':
-				return newPos == 71 || newPos == 79;
+				return newPos == currentPos - 9 || newPos == currentPos - 1;
 			break;
 		}
 	}
@@ -67,18 +73,21 @@ function checkMove(currentPos, newPos){
 		var edge = isInEdge(currentPos);
 		switch(edge){
 			case 'T':
-				return newPos == currentPos - 1 || newPos == currentPos + 1;
+				return newPos == currentPos - 1 || newPos == currentPos + 1 || newPos == currentPos + 9;
 			break;
 			case 'R':
-				return newPos == currentPos - 9 || newPos == currentPos + 9;
+				return newPos == currentPos - 9 || newPos == currentPos + 9 || newPos == currentPos - 1;
 			break;
 			case 'B':
-				return newPos == currentPos - 1 || newPos == currentPos + 1;
+				return newPos == currentPos - 1 || newPos == currentPos + 1 || newPos == currentPos - 9;
 			break;
 			case 'L':
-				return newPos == currentPos - 9 || newPos == currentPos + 9;
+				return newPos == currentPos - 9 || newPos == currentPos - 1 || newPos == currentPos + 9;
 			break;
 		}
+	}
+	else{ // in center of board
+		return newPos == currentPos - 9 || newPos == currentPos - 1 || newPos == currentPos + 1 || newPos == currentPos + 9;
 	}
 }
 
@@ -141,11 +150,3 @@ function getCorner(pos){
 		break;
 	}
 }
-
-
-
-
-
-
-
-
