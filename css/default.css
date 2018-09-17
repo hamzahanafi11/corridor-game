@@ -39,10 +39,11 @@ ul li{
 	display: flex;
 	float: left;
 	list-style-type: none;
-	width:50px;
-	height: 50px;
+	width:46px;
+	height: 46px;
 	background-color: #121212;
-	border:1px solid #afafaf;
+	border-right:4px solid #afafaf;
+	border-bottom:4px solid #afafaf;
 }
 
 

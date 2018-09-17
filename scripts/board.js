@@ -1,5 +1,5 @@
 function Board() {
-	
+
 	this.boxes = [
 		0,0,0,0,0,0,0,0,0,
 		0,0,0,0,0,0,0,0,0,
@@ -60,6 +60,6 @@ function Board() {
 		// draw player in new position
 		$('ul li:nth-child('+player.pos+')').find('i').addClass("fa-chess-pawn");
 		$('ul li:nth-child('+player.pos+')').find('i').attr("style","color:"+player.color);
-		this.boxes[player.pos - 1] = 'M'; // empty
+		this.boxes[player.pos - 1] = player.name; // empty
 	}
 }
