@@ -8,16 +8,6 @@ var steven	 = new Player(37,'#13aede','steven');
 var kemberly = new Player(45,'#eaef2b','kemberly');
 var brady	 = new Player(77,'#af5a0f','brady');
 
-var barriers = [];
-//adding random barriers for tests
-barriers.push({box1Pos: 40, box2Pos: 41, edge: "top"});
-barriers.push({box1Pos: 15, box2Pos: 16, edge: "bottom"});
-barriers.push({box1Pos: 34, box2Pos: 25, edge: "right"});
-barriers.push({box1Pos: 25, box2Pos: 16, edge: "left"});
-barriers.forEach(function(barrier){
-	board.drawBarrier(barrier);
-});
-
 // init all players
 marian.init();
 steven.init();
@@ -33,6 +23,15 @@ var winner			   = null;
 var userAddingBarrier  = false;
 var barrierPart1BoxPos = -1;
 var barrierPart2BoxPos = -1;
+var barriers 		   = [];
+//adding random barriers for tests
+// barriers.push({box1Pos: 40, box2Pos: 41, edge: "top"});
+// barriers.push({box1Pos: 15, box2Pos: 16, edge: "bottom"});
+// barriers.push({box1Pos: 34, box2Pos: 25, edge: "right"});
+// barriers.push({box1Pos: 25, box2Pos: 16, edge: "left"});
+// barriers.forEach(function(barrier){
+// 	board.drawBarrier(barrier);
+// });
 
 initDisplayScreen();
 
@@ -158,7 +157,10 @@ $('#validateBarrierBtn').on('click',function(evt){
 	$('#addBarrierBtn').show();
 	// give your turn to next player
 	giveTurnTo(getPlayer(getNextTurn(turn)));
+});
 
+$("input[name='edgeBorder']").on('click',function(){
+	// TODO ..please write somthing here
 });
 
 function buildBarrier(turn){
