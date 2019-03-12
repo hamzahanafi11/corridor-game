@@ -49,9 +49,9 @@ ul li{
 }
 
 
-/************* display *************/
+/************* display-screen *************/
 
-.display{
+.display-screen{
 	border: 1px	black dashed;
 	padding: 15px;
 }
@@ -61,6 +61,10 @@ ul li{
 .fa{
 /*	color: white;*/
 	margin: auto;
+}
+
+#nbr-barriers{
+	font-size: 1.4em;
 }
 
 /************* barrier *************/

@@ -1,5 +1,5 @@
 
-// reate the board
+// create the board
 var board = new Board();
 
 // create players
@@ -28,11 +28,13 @@ brady.init();
 board.init();
 
 // game params
-var turn   = 'marian';
-var winner = null;
-var userAddingBarrier = false;
+var turn			   = null;
+var winner			   = null;
+var userAddingBarrier  = false;
 var barrierPart1BoxPos = -1;
 var barrierPart2BoxPos = -1;
+
+initDisplayScreen();
 
 // playing and switching turns
 $('ul li').on('click',function(evt){
@@ -63,15 +65,10 @@ $('ul li').on('click',function(evt){
 	var goinTo = $(this).index() + 1;
 	switch(turn){
 		case 'marian':
-			// console.log('marian');
-			// console.log('==> from 		  : ' + marian.pos);
-			// console.log('==> to   		  : ' + goinTo);
-			// console.log('==> res  		  : ' + checkMove(marian.pos,goinTo));
-			//console.log('==> nearst edge  : ' + nearestEdgeBorder(evt.offsetX,evt.offsetY).edge);
 			if( checkMove(marian.pos,goinTo) && board.isPlaceEmpty(goinTo)  && !doBarrierExist(marian.pos,goinTo)){
 				marian.moveTo(goinTo);
 				if(checkWinner(marian) == false){
-					//turn = 'steven';
+					giveTurnTo(steven);
 				}else{
 					winner = 'marian';
 					turn   = null;
@@ -83,7 +80,8 @@ $('ul li').on('click',function(evt){
 			if( checkMove(steven.pos,goinTo) && board.isPlaceEmpty(goinTo) && !doBarrierExist(steven.pos,goinTo)){
 				steven.moveTo(goinTo);
 				if(checkWinner(steven) == false){
-					turn = 'kemberly';
+					giveTurnTo(kemberly);
+
 				}else{
 					winner = 'steven';
 					console.log('### CONGRATS Steven YOU ARE THE WINNER ###');
@@ -94,7 +92,7 @@ $('ul li').on('click',function(evt){
 			if( checkMove(kemberly.pos,goinTo) && board.isPlaceEmpty(goinTo) && !doBarrierExist(kemberly.pos,goinTo)){
 				kemberly.moveTo(goinTo);
 				if(checkWinner(kemberly) == false){
-					turn = 'brady';
+					giveTurnTo(brady);
 				}else{
 					winner = 'kemberly';
 					console.log('### CONGRATS Kemberly YOU ARE THE WINNER ###');
@@ -105,7 +103,7 @@ $('ul li').on('click',function(evt){
 			if( checkMove(brady.pos,goinTo) && board.isPlaceEmpty(goinTo) && !doBarrierExist(brady.pos,goinTo)){
 				brady.moveTo(goinTo);
 				if(checkWinner(brady) == false){
-					turn = 'marian';
+					giveTurnTo(marian);
 				}else{
 					winner = 'brady';
 					console.log('### CONGRATS Brady YOU ARE THE WINNER ###');
@@ -130,12 +128,18 @@ $('ul li').on('click',function(evt){
 *
 **/
 $('#addBarrierBtn').on('click',function(evt){
-	//switch to choosing barrier
+
+	// check if player can build a barrier
+	var player = getPlayer(turn);
+	if(player.qteBarriers === 0){
+		alert("No enough barriers for you :P");
+		return;
+	}
+	//switch to mode barrier
 	userAddingBarrier = true;
 	//show the label to tell user to choose where to place the barrier
 	$('.barrierOptions').show();
 	$('#addBarrierBtn').hide();
-
 });
 
 $('#validateBarrierBtn').on('click',function(evt){
@@ -143,16 +147,73 @@ $('#validateBarrierBtn').on('click',function(evt){
 	if(barrierPart1BoxPos === -1 || barrierPart2BoxPos ===-1 ){
 		return;
 	}
+	//this removes 1 barrier from player
+	buildBarrier(turn);
 	// reset variables for barrier
 	barrierPart1BoxPos = -1;
 	barrierPart2BoxPos = -1;
-	//drawBarrier();
 	board.resetHighLight();
 	userAddingBarrier = false;
 	$('.barrierOptions').hide();
 	$('#addBarrierBtn').show();
+	// give your turn to next player
+	giveTurnTo(getPlayer(getNextTurn(turn)));
 
 });
+
+function buildBarrier(turn){
+	var player = getPlayer(turn);
+	player.builBarrier();
+	updateScreen(player);
+}
+
+function getPlayer(turn){
+	switch (turn) {
+		case 'marian':
+			return marian;
+		break;
+		case 'steven':
+			return steven;
+		break;
+		case 'kemberly':
+			return kemberly;
+		break;
+		case 'brady':
+			return brady;
+		break;
+	}
+}
+
+function initDisplayScreen(){
+	giveTurnTo(marian);
+}
+
+function giveTurnTo(player){
+	turn = player.name;
+	updateScreen(player);
+}
+
+function updateScreen(player){
+	$('#player-icon').attr("style","color:" + player.color);
+	$('#nbr-barriers').text(player.qteBarriers);
+}
+
+function getNextTurn(turn){
+	switch (turn) {
+		case 'marian':
+			return 'steven';
+		break;
+		case 'steven':
+			return 'kemberly';
+		break;
+		case 'kemberly':
+			return 'brady';
+		break;
+		case 'brady':
+			return 'marian';
+		break;
+	}
+}
 
 function drawBarrier(){
 	// get the edge of barrier

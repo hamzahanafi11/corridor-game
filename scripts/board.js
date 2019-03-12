@@ -82,8 +82,6 @@ function Board() {
 	}
 
 	this.drawBarrier = function(barrier){
-		//$('ul li:nth-child('+barrier.box1Pos+')').attr("style","border-"+barrier.edge+":3px solid #FF0000");
-		//$('ul li:nth-child('+barrier.box2Pos+')').attr("style","border-"+barrier.edge+":3px solid #FF0000");
 		switch (barrier.edge) {
 			case 'top':
 				$('ul li:nth-child('+barrier.box1Pos+')').addClass("barrier-top-edge");

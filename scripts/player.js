@@ -1,11 +1,12 @@
 function Player(pos,color,name) {
 
-	this.oldPos = -1;
-	this.pos 	= pos;
-	this.color 	= color;
-	this.name	= name;
-	this.path 	= [pos]; // to track the path walked by the player
-	this.winLine = null;
+	this.oldPos 	 = -1;
+	this.pos 		 = pos;
+	this.color 		 = color;
+	this.name		 = name;
+	this.path 		 = [pos]; // to track the path walked by the player
+	this.winLine 	 = null;
+	this.qteBarriers = 5;
 
 	this.init = function(){
 		this.winLine = this.getWineLine(this.path[0]);
@@ -44,7 +45,7 @@ function Player(pos,color,name) {
 		});
 	};
 
-	this.buildWall = function(){
-
+	this.builBarrier = function(){
+		this.qteBarriers--;
 	};
 }
