@@ -8,6 +8,16 @@ var steven	 = new Player(37,'#13aede','steven');
 var kemberly = new Player(45,'#eaef2b','kemberly');
 var brady	 = new Player(77,'#af5a0f','brady');
 
+var barriers = [];
+//adding random barriers for tests
+barriers.push({box1Pos: 40, box2Pos: 41, edge: "top"});
+barriers.push({box1Pos: 15, box2Pos: 16, edge: "bottom"});
+barriers.push({box1Pos: 34, box2Pos: 25, edge: "right"});
+barriers.push({box1Pos: 25, box2Pos: 16, edge: "left"});
+barriers.forEach(function(barrier){
+	board.drawBarrier(barrier);
+});
+
 // init all players
 marian.init();
 steven.init();
@@ -20,203 +30,302 @@ board.init();
 // game params
 var turn   = 'marian';
 var winner = null;
+var userAddingBarrier = false;
+var barrierPart1BoxPos = -1;
+var barrierPart2BoxPos = -1;
 
 // playing and switching turns
 $('ul li').on('click',function(evt){
+	// mode building a barrier on board
+	if(userAddingBarrier && barrierPart1BoxPos === -1){
+		chooseFirstBox($(this).index() + 1);
+		return;
+	}
+	else if(userAddingBarrier  && barrierPart2BoxPos === -1){
+		var secondPos = $(this).index() + 1;
+		// check if user clicked on highlighted friends boxes
+		if(secondPos === barrierPart1BoxPos){
+			return; // because can't be friend of myself !
+		}
+		var choosedFromFriends = false;
+		var boxesFriendsPositions = findBoxFriends(barrierPart1BoxPos);
+		boxesFriendsPositions.forEach(function(pos){
+			if(secondPos === pos){
+				choosedFromFriends = true;
+			}
+		});
+		if(choosedFromFriends){
+			chooseSecondBox(secondPos);
+		}
+		return;
+	}
+	// mode making a move on board
 	var goinTo = $(this).index() + 1;
 	switch(turn){
 		case 'marian':
-			console.log('marian');
-			console.log('==> from 		  : ' + marian.pos);
-			console.log('==> to   		  : ' + goinTo);
-			console.log('==> res  		  : ' + checkMove(marian.pos,goinTo));
-			console.log('==> nearst edge  : ' + nearestEdgeBorder(evt.offsetX,evt.offsetY).edge);
-			if( checkMove(marian.pos,goinTo) && board.isPlaceEmpty(goinTo) ){
+			// console.log('marian');
+			// console.log('==> from 		  : ' + marian.pos);
+			// console.log('==> to   		  : ' + goinTo);
+			// console.log('==> res  		  : ' + checkMove(marian.pos,goinTo));
+			//console.log('==> nearst edge  : ' + nearestEdgeBorder(evt.offsetX,evt.offsetY).edge);
+			if( checkMove(marian.pos,goinTo) && board.isPlaceEmpty(goinTo)  && !doBarrierExist(marian.pos,goinTo)){
 				marian.moveTo(goinTo);
-			}
-			if(checkWinner(marian) == false){
-				//turn = 'steven';
-			}else{
-				winner = 'marian';
-				turn   = null;
-				console.log('### CONGRATS Marian YOU ARE THE WINNER ###');
+				if(checkWinner(marian) == false){
+					//turn = 'steven';
+				}else{
+					winner = 'marian';
+					turn   = null;
+					console.log('### CONGRATS Marian YOU ARE THE WINNER ###');
+				}
 			}
 		break;
 		case 'steven':
-			if( checkMove(steven.pos,goinTo) && board.isPlaceEmpty(goinTo) ){
+			if( checkMove(steven.pos,goinTo) && board.isPlaceEmpty(goinTo) && !doBarrierExist(steven.pos,goinTo)){
 				steven.moveTo(goinTo);
-			}
-			if(checkWinner(steven) == false){
-				turn = 'kemberly';
-			}else{
-				winner = 'steven';
-				console.log('### CONGRATS Steven YOU ARE THE WINNER ###');
+				if(checkWinner(steven) == false){
+					turn = 'kemberly';
+				}else{
+					winner = 'steven';
+					console.log('### CONGRATS Steven YOU ARE THE WINNER ###');
+				}
 			}
 		break;
 		case 'kemberly':
-			if( checkMove(kemberly.pos,goinTo) && board.isPlaceEmpty(goinTo) ){
+			if( checkMove(kemberly.pos,goinTo) && board.isPlaceEmpty(goinTo) && !doBarrierExist(kemberly.pos,goinTo)){
 				kemberly.moveTo(goinTo);
-			}
-			if(checkWinner(kemberly) == false){
-				turn = 'brady';
-			}else{
-				winner = 'kemberly';
-				console.log('### CONGRATS Kemberly YOU ARE THE WINNER ###');
+				if(checkWinner(kemberly) == false){
+					turn = 'brady';
+				}else{
+					winner = 'kemberly';
+					console.log('### CONGRATS Kemberly YOU ARE THE WINNER ###');
+				}
 			}
 		break;
 		case 'brady':
-			if( checkMove(brady.pos,goinTo) && board.isPlaceEmpty(goinTo) ){
+			if( checkMove(brady.pos,goinTo) && board.isPlaceEmpty(goinTo) && !doBarrierExist(brady.pos,goinTo)){
 				brady.moveTo(goinTo);
-			}
-			if(checkWinner(brady) == false){
-				turn = 'marian';
-			}else{
-				winner = 'brady';
-				console.log('### CONGRATS Brady YOU ARE THE WINNER ###');
+				if(checkWinner(brady) == false){
+					turn = 'marian';
+				}else{
+					winner = 'brady';
+					console.log('### CONGRATS Brady YOU ARE THE WINNER ###');
+				}
 			}
 		break;
 	}
 });
 
-// adding a Barrier
-// hover an element
+// moving/adding barriers to the board
+/*
+* TODO : ADD barriers :
+*
+*   1- click on button add barrier
+*	2- choose an edge
+*	3- tell user to select a box
+*	4- color the box and search for it's friends and also color them
+*	5- show validate button
+*	6- valite the user choice and update the board
+*
+*	Note: tow boxes are friends if they can form a barrier
+*
+**/
+$('#addBarrierBtn').on('click',function(evt){
+	//switch to choosing barrier
+	userAddingBarrier = true;
+	//show the label to tell user to choose where to place the barrier
+	$('.barrierOptions').show();
+	$('#addBarrierBtn').hide();
 
-// var edge = null;
-// var _watch = null;
-// $('ul li').click(function(evt){
-// 	var edge = nearestEdgeBorder(evt.offsetX,evt.offsetY).edge;
-// 	if(edge != 'top' && edge != 'left'){
-//         setInterval(function() {
-//             if ( _watch !== edge ) {
-//                 _watch = edge;
-//                 $(this).removeAttr('style');
-//             }
-//         }, 100);
-//     	$(this).css('border-'+edge,'4px solid red');
-// 		$(this).attr(edge+'-barrier',1);
-//     }
-// });
+});
 
-// $('ul li').hover(function(evt){
-// 	console.log(evt);
-// 	console.log(evt.offsetX);
-// 	console.log(evt.offsetY);
-// 	var edge = nearestEdgeBorder(evt.offsetX,evt.offsetY).edge;
-//
-// 	if(edge != 'top' && edge != 'left'){
-// 		var cellNumber = Number($(this).attr('cell-number'));
-// 		var secondCellNumber = getSecondCellNumber(cellNumber,edge,evt.offsetX,evt.offsetY); // working on this function now
-//         setInterval(function() {
-//             if ( _watch !== edge ) {
-//                 _watch = edge;
-//                 $(this).removeAttr('style');
-//             }
-//         }, 100);
-// 		$(this).css('border-'+edge,'4px solid red');
-// 		$('ul li:nth-child('+secondCellNumber+')').css('border-'+edge,'4px solid red');
-//     }
-// 	if (evt.type == 'mouseleave' ){
-// 		if( $(this).attr('right-barrier') == "0"){
-// 			$(this).css('border-right', '4px solid #afafaf');
-// 			$('ul li:nth-child('+secondCellNumber+')').css('border-right', '4px solid #afafaf');
-// 		}
-// 		if( $(this).attr('bottom-barrier') == "0"){
-// 			$(this).css('border-bottom', '4px solid #afafaf');
-// 			$('ul li:nth-child('+secondCellNumber+')').css('border-bottom', '4px solid #afafaf');
-// 		}
-// 	}
-// });
+$('#validateBarrierBtn').on('click',function(evt){
+	//draw barrier
+	if(barrierPart1BoxPos === -1 || barrierPart2BoxPos ===-1 ){
+		return;
+	}
+	// reset variables for barrier
+	barrierPart1BoxPos = -1;
+	barrierPart2BoxPos = -1;
+	//drawBarrier();
+	board.resetHighLight();
+	userAddingBarrier = false;
+	$('.barrierOptions').hide();
+	$('#addBarrierBtn').show();
 
-// $('ul li').on('mousemove',function(evt){
-// 	console.log(evt);
-// 	console.log(evt.offsetX);
-// 	console.log(evt.offsetY);
-// 	var cellNumber = Number($(this).attr('cell-number'));
-// 	var edge = nearestEdgeBorder(evt.offsetX,evt.offsetY).edge;
-// 	var secondCellNumber = getSecondCellNumber(cellNumber,edge,evt.offsetX,evt.offsetY); // working on this function now
-//
-// 	if( $(this).attr('right-barrier') == "0"){
-// 		$(this).css('border-right', '4px solid #afafaf');
-// 		$('ul li:nth-child('+secondCellNumber+')').css('border-right', '4px solid #afafaf');
-// 	}
-// 	if( $(this).attr('bottom-barrier') == "0"){
-// 		$(this).css('border-bottom', '4px solid #afafaf');
-// 		$('ul li:nth-child('+secondCellNumber+')').css('border-bottom', '4px solid #afafaf');
-// 	}
-//
-// 	$(this).css('border-'+edge,'4px solid red');
-// 	$('ul li:nth-child('+secondCellNumber+')').css('border-'+edge,'4px solid red');
-// });
+});
 
-// returns the number of cell that is next  to the current cell based on border
-function getSecondCellNumber(cellNumber,edgeBorder,borderPosX,borderPosY){
-	var cellPosition = isInEdge(cellNumber); // values =  T,R,B,L,false
-	if(cellPosition == false){ // the cell is in the center of board
-		if(edgeBorder == 'right'){
-			return borderPosY < 25 ? cellNumber - 9 : cellNumber + 9;
-		}
-		else if(edgeBorder == 'bottom'){
-			return borderPosX < 25 ? cellNumber - 1 : cellNumber + 1;
+function drawBarrier(){
+	// get the edge of barrier
+	var edge = $("input[name='edgeBorder']:checked").val();
+	// create the barrier and draw it, also keep track of it
+	var barrier = new Barrier(barrierPart1BoxPos,barrierPart2BoxPos,edge);
+	barriers.push(barrier);
+	board.drawBarrier(barrier);
+}
+
+function chooseFirstBox(boxPos){
+	//first barrier choosed
+	barrierPart1BoxPos = boxPos;
+	// highlight it
+	board.highLightBoxBarrier(boxPos);
+	// highlight it's friends
+	var boxesFriendsPositions = findBoxFriends(boxPos);
+	// if it has only 1 freind just draw the barrier, chooseSecondBox is skiped in this case
+	if(boxesFriendsPositions.length === 1){
+		var edge = $("input[name='edgeBorder']:checked").val();
+		barrierPart2BoxPos = boxesFriendsPositions[0];
+		board.highLightBoxBarrier(barrierPart2BoxPos);
+		drawBarrier();
+		return;
+	}
+	// now highlight friends
+	boxesFriendsPositions.forEach(function(pos){
+		board.highLightBoxBarrier(pos);
+	});
+}
+
+function chooseSecondBox(boxPos){
+	//first barrier choosed
+	barrierPart2BoxPos = boxPos;
+	// highlight it
+	board.highLightOnlyBoxesForBarrier(barrierPart1BoxPos,barrierPart2BoxPos);
+	drawBarrier();
+}
+
+// returns only position of friends (does not return the position of barrierPart1BoxPos)
+function findBoxFriends(boxPos){
+	if(boxPos < 0){
+		return [];
+	}
+	var edge = $("input[name='edgeBorder']:checked").val();
+	if(isInCorner(boxPos)){
+		var corner = getCorner(boxPos);
+		switch(corner){
+			case 'TL':
+				return edge === "top"    ? [boxPos + 1] :
+					   edge === "bottom" ? [boxPos + 1] :
+					   edge === "right"  ? [boxPos + 9] :
+					   edge === "left"   ? [boxPos + 9] : []
+			break;
+			case 'TR':
+				return edge === "top"    ? [boxPos - 1] :
+					   edge === "bottom" ? [boxPos - 1] :
+					   edge === "right"  ? [boxPos + 9] :
+					   edge === "left"   ? [boxPos + 9] : []
+			break;
+			case 'BL':
+				return edge === "top"    ? [boxPos + 1] :
+					   edge === "bottom" ? [boxPos + 1] :
+					   edge === "right"  ? [boxPos - 9] :
+					   edge === "left"   ? [boxPos - 9] : []
+			break;
+			case 'BR':
+				return edge === "top"    ? [boxPos - 1] :
+					   edge === "bottom" ? [boxPos - 1] :
+					   edge === "right"  ? [boxPos - 9] :
+					   edge === "left"   ? [boxPos - 9] : []
+			break;
 		}
 	}
-	switch(getCorner(cellNumber)){
-		case 'TL':
-			return edgeBorder == 'right' ? cellNumber + 9 : cellNumber + 1;
-		break;
-		case 'TR':
-			return edgeBorder == 'right' ? cellNumber + 9 : cellNumber - 1;
-		break;
-		case 'BL':
-			return edgeBorder == 'right' ? cellNumber - 9 : cellNumber + 1;
-		break;
-		case 'BR':
-			return edgeBorder == 'right' ? cellNumber - 9 : cellNumber - 1;
-		break;
+	else if(isInEdge(boxPos) != false){
+		switch(isInEdge(boxPos)){
+			case 'T':
+				return edge === "top" ? [boxPos - 1, boxPos + 1] :
+					   edge === "bottom" ? [boxPos - 1, boxPos + 1] :
+					   edge === "right" ? [boxPos + 9] :
+					   edge === "left" ? [boxPos + 9] : []
+			break;
+			case 'R':
+				return edge === "top" ? [boxPos - 1] :
+					   edge === "bottom" ? [boxPos - 1] :
+					   edge === "right" ? [boxPos - 9, boxPos + 9] :
+					   edge === "left" ? [boxPos - 9, boxPos + 9] : []
+			break;
+			case 'B':
+				return edge === "top" ? [boxPos - 1, boxPos + 1] :
+					   edge === "bottom" ? [boxPos - 1, boxPos + 1] :
+					   edge === "right" ? [boxPos - 9] :
+					   edge === "left" ? [boxPos - 9] : []
+			break;
+			case 'L':
+				return edge === "top" ? [boxPos + 1] :
+					   edge === "bottom" ? [ boxPos + 1] :
+					   edge === "right" ? [boxPos - 9, boxPos + 9] :
+					   edge === "left" ? [boxPos - 9, boxPos + 9] : []
+			break;
+		}
 	}
-	switch(cellPosition){ // the cell is on an adge
-		case 'T': // top edge
-			if(edgeBorder == 'right'){
-				return cellNumber + 9;
-			}else if(edgeBorder == 'bottom'){
-				return borderPosX < 25 ? cellNumber - 1 : cellNumber + 1;
-			}
-		break;
-		case 'R': // right edge
-			if(edgeBorder == 'right'){
-				return borderPosY < 25 ? cellNumber - 9 : cellNumber + 9;
-			}else if(edgeBorder == 'bottom'){
-				return cellNumber - 1;
-			}
-		break;
-		case 'B':  // bottom edge
-			//return edgeBorder == 'right' ?  cellNumber - 9 : cellNumber - 1;
-			if(edgeBorder == 'right'){
-				return cellNumber - 9;
-			}else if(edgeBorder == 'bottom'){
-				return borderPosX < 25 ? cellNumber - 1 : cellNumber + 1;
-			}
-		break;
-		case 'L': // left edge
-			if(edgeBorder == 'right'){
-				return borderPosY < 25 ? cellNumber - 9 : cellNumber + 9;
-			}else if(edgeBorder == 'bottom'){
-				return cellNumber + 1;
-			}
-		break;
+	else{ // in center of board
+		return edge === "top" ? [boxPos - 1, boxPos + 1] :
+			   edge === "bottom" ? [boxPos - 1, boxPos + 1] :
+			   edge === "right" ? [boxPos - 9, boxPos + 9] :
+			   edge === "left" ? [boxPos - 9, boxPos + 9] : []
 	}
 }
 
-function nearestEdgeBorder(x,y){
-	var topDistance	   = { distance : y - 0 , edge : 'top'};
-	var rightDistance  = { distance : 50 - x , edge : 'right'};
-	var bottomDistance = { distance : 50 - y , edge : 'bottom'};
-	var leftDistance   = { distance : x - 0 , edge : 'left'};
-	return minValue( minValue(topDistance,rightDistance),minValue(bottomDistance,leftDistance) );
-}
-
-function minValue(a,b){
-	// even if a == b we want to return a value
-	return a.distance < b.distance ? a : b;
+function doBarrierExist(fromPos, toPos){
+	var barrierExist = false;
+	barriers.forEach(function(barrier){
+		switch(barrier.edge){
+			case 'top':
+				if((barrier.box1Pos === fromPos) && (barrier.box1Pos === toPos + 9)){
+					barrierExist = true;
+				}
+				if((barrier.box2Pos === fromPos) && (barrier.box2Pos === toPos + 9)){
+					barrierExist = true;
+				}
+				if((barrier.box1Pos === toPos) && (barrier.box1Pos === fromPos + 9)){
+					barrierExist = true;
+				}
+				if((barrier.box2Pos === toPos) && (barrier.box2Pos === fromPos + 9)){
+					barrierExist = true;
+				}
+			break;
+			case 'right':
+				if((barrier.box1Pos === fromPos) && (barrier.box1Pos === toPos - 1 )){
+					barrierExist = true;
+				}
+				if((barrier.box2Pos === fromPos) && (barrier.box2Pos === toPos - 1 )){
+					barrierExist = true;
+				}
+				if((barrier.box1Pos === toPos) && (barrier.box1Pos === fromPos - 1 )){
+					barrierExist = true;
+				}
+				if((barrier.box2Pos === toPos) && (barrier.box2Pos === fromPos - 1 )){
+					barrierExist = true;
+				}
+			break;
+			case 'bottom':
+				if((barrier.box1Pos === fromPos) && (barrier.box1Pos === toPos - 9 )){
+					barrierExist = true;
+				}
+				if((barrier.box2Pos === fromPos) && (barrier.box2Pos === toPos - 9 )){
+					barrierExist = true;
+				}
+				if((barrier.box1Pos === toPos) && (barrier.box1Pos === fromPos - 9 )){
+					barrierExist = true;
+				}
+				if((barrier.box2Pos === toPos) && (barrier.box2Pos === fromPos - 9 )){
+					barrierExist = true;
+				}
+			break;
+			case 'left':
+				if((barrier.box1Pos === fromPos) && (barrier.box1Pos === toPos + 1 )){
+					barrierExist = true;
+				}
+				if((barrier.box2Pos === fromPos) && (barrier.box2Pos === toPos + 1 )){
+					barrierExist = true;
+				}
+				if((barrier.box1Pos === toPos) && (barrier.box1Pos === fromPos + 1 )){
+					barrierExist = true;
+				}
+				if((barrier.box2Pos === toPos) && (barrier.box2Pos === fromPos + 1 )){
+					barrierExist = true;
+				}
+			break;
+		}
+	});
+	return barrierExist;
 }
 
 function checkWinner(player){
@@ -255,7 +364,7 @@ function checkMove(currentPos, newPos){
 				return newPos == currentPos - 1 || newPos == currentPos + 1 || newPos == currentPos - 9;
 			break;
 			case 'L':
-				return newPos == currentPos - 9 || newPos == currentPos - 1 || newPos == currentPos + 9;
+				return newPos == currentPos - 9 || newPos == currentPos + 1 || newPos == currentPos + 9;
 			break;
 		}
 	}
@@ -301,7 +410,7 @@ function isInLeftEdge(pos){
 }
 
 
-// check if a player is in a corner
+// check if position is in a corner
 function isInCorner(pos){
 	return pos == 1 || pos == 9 || pos == 73 || pos == 81;
 }

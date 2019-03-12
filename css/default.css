@@ -35,15 +35,17 @@ ul{
     margin-right: 412px;*/
 }
 ul li{
+	box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
 	cursor: pointer;
 	display: flex;
 	float: left;
 	list-style-type: none;
-	width:46px;
-	height: 46px;
+	width:50px;
+	height: 50px;
 	background-color: #121212;
-	border-right:4px solid #afafaf;
-	border-bottom:4px solid #afafaf;
+	border:1px solid #afafaf;
 }
 
 
@@ -59,4 +61,30 @@ ul li{
 .fa{
 /*	color: white;*/
 	margin: auto;
+}
+
+/************* barrier *************/
+
+#barrierLabel{
+	display: none;
+}
+
+.barrierOptions{
+	display: none;
+}
+
+.barrier-top-edge {
+	border-top: 3px solid #FF0000;
+}
+
+.barrier-bottom-edge {
+	border-bottom: 3px solid #FF0000;
+}
+
+.barrier-right-edge {
+	border-right: 3px solid #FF0000;
+}
+
+.barrier-left-edge {
+	border-left: 3px solid #FF0000;
 }
