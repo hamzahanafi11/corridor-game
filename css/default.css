@@ -78,17 +78,17 @@ ul li{
 }
 
 .barrier-top-edge {
-	border-top: 3px solid #FF0000;
+	border-top: 3px solid #FFB200;
 }
 
 .barrier-bottom-edge {
-	border-bottom: 3px solid #FF0000;
+	border-bottom: 3px solid #FFB200;
 }
 
 .barrier-right-edge {
-	border-right: 3px solid #FF0000;
+	border-right: 3px solid #FFB200;
 }
 
 .barrier-left-edge {
-	border-left: 3px solid #FF0000;
+	border-left: 3px solid #FFB200;
 }

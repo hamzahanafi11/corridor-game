@@ -81,6 +81,17 @@ function Board() {
 		this.highLightBoxBarrier(box2Pos);
 	}
 
+	this.refreshBarriers = function(barriers){
+		$('ul li').removeClass("barrier-top-edge")
+				  .removeClass("barrier-bottom-edge")
+				  .removeClass("barrier-right-edge")
+				  .removeClass("barrier-left-edge");
+		var self = this;
+		barriers.forEach(function(barrier){
+			self.drawBarrier(barrier);
+		});
+	}
+
 	this.drawBarrier = function(barrier){
 		switch (barrier.edge) {
 			case 'top':

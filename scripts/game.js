@@ -48,14 +48,14 @@ $('ul li').on('click',function(evt){
 		if(secondPos === barrierPart1BoxPos){
 			return; // because can't be friend of myself !
 		}
-		var choosedFromFriends = false;
+		// var choosedFromFriends = false;
 		var boxesFriendsPositions = findBoxFriends(barrierPart1BoxPos);
-		boxesFriendsPositions.forEach(function(pos){
-			if(secondPos === pos){
-				choosedFromFriends = true;
-			}
-		});
-		if(choosedFromFriends){
+		// boxesFriendsPositions.forEach(function(pos){
+		// 	if(secondPos === pos){
+		// 		choosedFromFriends = true;
+		// 	}
+		// });
+		if(boxesFriendsPositions.includes(secondPos)){
 			chooseSecondBox(secondPos);
 		}
 		return;
@@ -146,6 +146,10 @@ $('#validateBarrierBtn').on('click',function(evt){
 	if(barrierPart1BoxPos === -1 || barrierPart2BoxPos ===-1 ){
 		return;
 	}
+	// draw the real barrier !
+	var edge = $("input[name='edgeBorder']:checked").val();
+	barriers.push(new Barrier(barrierPart1BoxPos,barrierPart2BoxPos,edge));
+	board.refreshBarriers(barriers);
 	//this removes 1 barrier from player
 	buildBarrier(turn);
 	// reset variables for barrier
@@ -159,8 +163,18 @@ $('#validateBarrierBtn').on('click',function(evt){
 	giveTurnTo(getPlayer(getNextTurn(turn)));
 });
 
-$("input[name='edgeBorder']").on('click',function(){
+$("input[name='edgeBorder']").on('click', function(){
 	// TODO ..please write somthing here
+	if(barrierPart1BoxPos === -1){
+		return;
+	}
+	if(barrierPart1BoxPos !== -1 && barrierPart1BoxPos !== -1){
+		// player wants to change his barrier position and/or edge
+		barrierPart2BoxPos = -1;
+	}
+	board.resetHighLight();
+	board.refreshBarriers(barriers);
+	chooseFirstBox(barrierPart1BoxPos);
 });
 
 function buildBarrier(turn){
@@ -217,15 +231,6 @@ function getNextTurn(turn){
 	}
 }
 
-function drawBarrier(){
-	// get the edge of barrier
-	var edge = $("input[name='edgeBorder']:checked").val();
-	// create the barrier and draw it, also keep track of it
-	var barrier = new Barrier(barrierPart1BoxPos,barrierPart2BoxPos,edge);
-	barriers.push(barrier);
-	board.drawBarrier(barrier);
-}
-
 function chooseFirstBox(boxPos){
 	//first barrier choosed
 	barrierPart1BoxPos = boxPos;
@@ -238,7 +243,9 @@ function chooseFirstBox(boxPos){
 		var edge = $("input[name='edgeBorder']:checked").val();
 		barrierPart2BoxPos = boxesFriendsPositions[0];
 		board.highLightBoxBarrier(barrierPart2BoxPos);
-		drawBarrier();
+		// this is a demo of how a barrier will looks like,
+		// it's not real because not pushed into barriers array
+		board.drawBarrier(new Barrier(barrierPart1BoxPos,barrierPart2BoxPos,edge));
 		return;
 	}
 	// now highlight friends
@@ -252,7 +259,8 @@ function chooseSecondBox(boxPos){
 	barrierPart2BoxPos = boxPos;
 	// highlight it
 	board.highLightOnlyBoxesForBarrier(barrierPart1BoxPos,barrierPart2BoxPos);
-	drawBarrier();
+	var edge = $("input[name='edgeBorder']:checked").val();
+	board.drawBarrier(new Barrier(barrierPart1BoxPos,barrierPart2BoxPos,edge));
 }
 
 // returns only position of friends (does not return the position of barrierPart1BoxPos)
