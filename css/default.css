@@ -73,6 +73,10 @@ ul li{
 	display: none;
 }
 
+.pull-left{
+	float: right;
+}
+
 .barrierOptions{
 	display: none;
 }

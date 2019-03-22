@@ -12,6 +12,8 @@ TODO :
 * [X] Adding barriers to board
 * [X] Adding events on barrier edge
 * [X] Improve the highlighting feature
+* [X] Adding a reset barrier button
+* [X] Adding a cancel barrier button
 
 play with friends [demo](https://hamzahanafi11.github.io/corridor-game/)
 

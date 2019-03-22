@@ -127,7 +127,6 @@ $('ul li').on('click',function(evt){
 *
 **/
 $('#addBarrierBtn').on('click',function(evt){
-
 	// check if player can build a barrier
 	var player = getPlayer(turn);
 	if(player.qteBarriers === 0){
@@ -144,6 +143,7 @@ $('#addBarrierBtn').on('click',function(evt){
 $('#validateBarrierBtn').on('click',function(evt){
 	//draw barrier
 	if(barrierPart1BoxPos === -1 || barrierPart2BoxPos ===-1 ){
+		alert('Please choose where to put the barrier!!');
 		return;
 	}
 	// draw the real barrier !
@@ -163,8 +163,27 @@ $('#validateBarrierBtn').on('click',function(evt){
 	giveTurnTo(getPlayer(getNextTurn(turn)));
 });
 
+//reset barrier button
+$("#resetBarrier").on('click', () => {
+	barrierPart1BoxPos = -1;
+	barrierPart2BoxPos = -1;
+	board.resetHighLight();
+	board.refreshBarriers(barriers);
+});
+
+//cancel barrier button
+$("#cancelBarrier").on('click', () => {
+	// reset the barrier
+	$("#resetBarrier").click();
+	//switch to mode moving
+	userAddingBarrier = false;
+	//show the label to tell user to choose where to place the barrier
+	$('.barrierOptions').hide();
+	$('#addBarrierBtn').show();
+});
+
+// when clicking on an edge option
 $("input[name='edgeBorder']").on('click', function(){
-	// TODO ..please write somthing here
 	if(barrierPart1BoxPos === -1){
 		return;
 	}
