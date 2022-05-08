@@ -1,6 +1,7 @@
 # corridor-game By Hamza Hanafi
 
-Building a simple corridor game, feel free to fork project or download it
+Building a simple corridor game. 
+Feel free to contributes with me :)
 
 You can also do some pull requests
 
