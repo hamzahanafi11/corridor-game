@@ -3,7 +3,7 @@
 Building a simple corridor game. 
 Feel free to contributes with me :)
 
-You can also do some pull requests
+You can also send pull requests
 
 TODO :
 
