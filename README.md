@@ -18,4 +18,4 @@ TODO :
 
 play with your friends [demo](https://hamzahanafi11.github.io/corridor-game/)
 
-Happy coding
+Happy coding <3
