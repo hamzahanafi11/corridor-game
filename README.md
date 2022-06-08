@@ -17,5 +17,3 @@ TODO :
 * [X] Adding a cancel barrier button
 
 play with your friends [demo](https://hamzahanafi11.github.io/corridor-game/)
-
-Happy coding
